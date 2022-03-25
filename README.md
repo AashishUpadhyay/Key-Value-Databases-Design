@@ -44,17 +44,17 @@ The problem of huge index size can be solved if the segments are sorted. This al
 The segments are called as SSTable(Sorted Strings Table)
 
 How SSTables are formed?
-- SSTables are formed using B-Trees
-- All incoming writes are performed on an in-memory B-Tree datastructure called memtable
+- SSTables are formed using an in-memory B-Tree called memtable. All incoming writes are performed on in-memory B-Tree datastructure
 - If memtable becomes two big then its flushed to the disk and a new memtable is used for subsequent writes. This switch operation is atomic
 - Immutable segments on disk undergo merge and compaction
-- During reads, the search is first performed in the memtable and then in the on-disk segments based on recency order
+- During reads, the search is first performed in the memtable and then in the on-disk segments based on their levels. Segment at each level maintains a sparse index for efficienc search
+- The memtable and SSTable together are called LSM Trees 
 
-This approach is used in dabases like DynamoDB, Cassandra
+This approach is used in dabases like DynamoDB, Cassandra and 
 
-## Availability
+## Replication
 
-A single node is prone to failure. To increase databases replicate data synchronously\asynchronously. There are three popuplar configurations:
+A single node is prone to failure. To increase availability databases replicate data synchronously\asynchronously. There are three popuplar configurations:
 
 ![alt text](SingleMultileaderReplicaConfigs.png)
 
@@ -76,8 +76,25 @@ A single node is prone to failure. To increase databases replicate data synchron
 3.) Leaderless:
 - Used in dynamo style databases
 - Work on quoram condition (N > R + W)
+    - N is the total no of replicas
+    - R is the no of replicas for successful read
+    - W is the no of replicas for successful write
 - Replica Consistency:
     - Read Repair: During reads, if divergence is obseved then the latest value is replicated on all replicase
     - Anti Entropy Process: A background process looks for differences between the replicase and copies missing data from one replica to other. The process uses Merkle trees to identify divergence
     - When N is large and client can connect to some database nodes but not to the ones required to get quoram, some databases allow writing data temporarily to non-quoram nodes to increase availability. When quoram nodes are available the temporary data is sent to the quoram nodes. This is called hinted-handoffs
 
+## Partitioning
+
+- Maintaining all data in a single node is never scalable
+- In order to scale databases use partitioning to distribute data across nodes. This allows a database to use the compute power of multiple servers simultaneously
+- Two partitioning stratgies are popular:
+    - Range Based Partitioning
+        - Useful when the query pattern requires range based searches
+    - Key Based Partitioning
+        - When data is to be queried primarily using the partitioning key e.g. find the list of people a user is friends with on facebook
+
+![alt text](PartitioningStrategies.png)
+
+- When the number of nodes in the cluster increases or decreses then the above partitioning approaches requires redistribution of data. This can be solved using an approach called Consistent Hashing
+![alt text](ConsistentHashing.png)
