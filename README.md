@@ -16,7 +16,7 @@ db_get(){
 - Write cost is O(1), we only append to a file
 - Read cost is O(N)
 
-## Define an inmemory Index
+## Define an in-memory Index
 
 ![alt text](SimpleDatabaseWithIndex.png)
 
@@ -33,7 +33,23 @@ This approach is used in bitcask the storage engine for Riak
 - During read the key is first searched in the most recent segment and if not found later segments are searched. To improve search performance techniques like bloom filters are used. Bloom filters are probabilistic data strcuture that may produce false positives but never false negatives
 
 **Cons** 
-- The Index size is limited by the memory and therefore suitable for use cases where unique keys are few
+- The Index size is limited by the memory as we keep maintaining each key in the Index. Therefore this approach is suitable for use cases where one has only a few unique keys
 - Inefficient range queries
 
+## Maintain sorted segments
+
+The problem of huge index size can be solved if the segments are sorted. This allows us to have ansparse index for a segment e.g. If one has to look for handkerchief, the value can be found between the offsets for handcuffs and handprinted
+![alt text](SSTables.png)
+
+The segments are called as SSTable(Sorted Strings Table)
+
+How SSTables are formed?
+- SSTables are formed using B-Trees
+- All incoming writes are performed on an in-memory B-Tree datastructure called memtable
+- If memtable becomes two big then its flushed to the disk as an immutable segment where merge and compaction is performed
+- During read the value is first searched in the memtable and then in the on-disk segments based on recency order
+
+The segments are called as SSTable(Sorted Strings Table) and in-memory Index are called
+
+This approach is used in dabases like DynamoDB, Cassandra
 
