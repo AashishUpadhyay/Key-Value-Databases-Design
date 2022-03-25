@@ -76,7 +76,6 @@ A single node is prone to failure. To increase databases replicate data synchron
 3.) Leaderless:
 - Used in dynamo style databases
 - Work on quoram condition (N > R + W)
-    
 - Replica Consistency:
     - Read Repair: During reads, if divergence is obseved then the latest value is replicated on all replicase
     - Anti Entropy Process: A background process looks for differences between the replicase and copies missing data from one replica to other. The process uses Merkle trees to identify divergence
