@@ -59,14 +59,14 @@ A single node is prone to failure. To increase databases replicate data synchron
 ![alt text](SingleMultileaderReplicaConfigs.png)
 
 1.) Single Leader
-    - All writes are routed to leader
-    - When follower fails it uses local logs to recover and requests leader to provide the missing data
-    - When leader fails, a follower with most upto date changes is promoted as a leader. Getting all followers to agree on a new leader is consensus problem and alogorithms like Paxos and Raft to arrive at consensus
-        - Challenges:
-            - Client machines have to be reconfigured once leader fails
-            - What to do with data that could not get replicated. The most common solution is to discard the data. This could be a problem if other storage systems need to be co-ordinated based on database contents. For example, in one incident at GitHub [13], an out-of-date MySQL follower was promoted to leader. The database used an autoincrementing counter to assign primary keys to new rows, but because the new leader’s counter lagged behind the old leader’s, it reused some primary keys that were previously assigned by the old leader. These primary keys were also used in a Redis store, so the reuse of primary keys resulted in inconsistency between MySQL and Redis, which caused some private data to be disclosed to the wrong users
-            - Split Brain, when a leader is unresponsive for sometime and becomes online again after a follower is promoted as a leader. If both leaders accept right with no process to resolve conflicts, it could lead to data corruption
-        - Most failovers are performed manually even when software supports automatic failover
+- All writes are routed to leader
+- When follower fails it uses local logs to recover and requests leader to provide the missing data
+- When leader fails, a follower with most upto date changes is promoted as a leader. Getting all followers to agree on a new leader is consensus problem and alogorithms like Paxos and Raft to arrive at consensus
+    - Challenges:
+        - Client machines have to be reconfigured once leader fails
+        - What to do with data that could not get replicated. The most common solution is to discard the data. This could be a problem if other storage systems need to be co-ordinated based on database contents. For example, in one incident at GitHub [13], an out-of-date MySQL follower was promoted to leader. The database used an autoincrementing counter to assign primary keys to new rows, but because the new leader’s counter lagged behind the old leader’s, it reused some primary keys that were previously assigned by the old leader. These primary keys were also used in a Redis store, so the reuse of primary keys resulted in inconsistency between MySQL and Redis, which caused some private data to be disclosed to the wrong users
+        - Split Brain, when a leader is unresponsive for sometime and becomes online again after a follower is promoted as a leader. If both leaders accept right with no process to resolve conflicts, it could lead to data corruption
+    - Most failovers are performed manually even when software supports automatic failover
 2.) Multi Leader
     - Useful in scenarios when multiple datacenters are used. When one datacenter fails the traffic is routed to the other
 
@@ -74,11 +74,11 @@ A single node is prone to failure. To increase databases replicate data synchron
 ![alt text](LeaderlessReplication.png)
 
 3.) Leaderless:
-    - Used in dynamo style databases
-    - Work on quoram condition (N > R + W)
+- Used in dynamo style databases
+- Work on quoram condition (N > R + W)
     
-    - Replica Consistency:
-        - Read Repair: During reads, if divergence is obseved then the latest value is replicated on all replicase
-        - Anti Entropy Process: A background process looks for differences between the replicase and copies missing data from one replica to other. The process uses Merkle trees to identify divergence
-        - When N is large and client can connect to some database nodes but not to the ones required to get quoram, some databases allow writing data temporarily to non-quoram nodes to increase availability. When quoram nodes are available the temporary data is sent to the quoram nodes. This is called hinted-handoffs
+- Replica Consistency:
+    - Read Repair: During reads, if divergence is obseved then the latest value is replicated on all replicase
+    - Anti Entropy Process: A background process looks for differences between the replicase and copies missing data from one replica to other. The process uses Merkle trees to identify divergence
+    - When N is large and client can connect to some database nodes but not to the ones required to get quoram, some databases allow writing data temporarily to non-quoram nodes to increase availability. When quoram nodes are available the temporary data is sent to the quoram nodes. This is called hinted-handoffs
 
