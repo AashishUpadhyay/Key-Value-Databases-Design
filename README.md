@@ -38,7 +38,7 @@ This approach is used in bitcask the storage engine for Riak
 
 ## Maintain sorted segments
 
-The problem of huge index size can be solved if the segments are sorted. This allows us to have ansparse index for a segment e.g. If one has to look for handkerchief, the value can be found between the offsets for handcuffs and handprinted
+The problem of huge index size can be solved if the segments are sorted. This allows us to have a sparse index for a segment e.g. If one has to look for handkerchief, the value can be found between the offsets for handcuffs and handprinted
 ![alt text](SSTables.png)
 
 The segments are called as SSTable(Sorted Strings Table)
