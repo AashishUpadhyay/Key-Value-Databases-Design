@@ -50,7 +50,5 @@ How SSTables are formed?
 - Immutable segments on disk undergo merge and compaction
 - During reads, the search is first performed in the memtable and then in the on-disk segments based on recency order
 
-The segments are called as SSTable(Sorted Strings Table) and in-memory Index are called
-
 This approach is used in dabases like DynamoDB, Cassandra
 
