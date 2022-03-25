@@ -46,8 +46,9 @@ The segments are called as SSTable(Sorted Strings Table)
 How SSTables are formed?
 - SSTables are formed using B-Trees
 - All incoming writes are performed on an in-memory B-Tree datastructure called memtable
-- If memtable becomes two big then its flushed to the disk as an immutable segment where merge and compaction is performed
-- During read the value is first searched in the memtable and then in the on-disk segments based on recency order
+- If memtable becomes two big then its flushed to the disk and a new memtable is used for subsequent writes. This switch operation is atomic
+- Immutable segments on disk undergo merge and compaction
+- During reads, the search is first performed in the memtable and then in the on-disk segments based on recency order
 
 The segments are called as SSTable(Sorted Strings Table) and in-memory Index are called
 
