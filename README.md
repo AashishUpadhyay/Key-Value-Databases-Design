@@ -67,6 +67,7 @@ A single node is prone to failure. To increase availability databases replicate 
         - What to do with data that could not get replicated. The most common solution is to discard the data. This could be a problem if other storage systems need to be co-ordinated based on database contents. For example, in one incident at GitHub, an out-of-date MySQL follower was promoted to leader. The database used an autoincrementing counter to assign primary keys to new rows, but because the new leader’s counter lagged behind the old leader’s, it reused some primary keys that were previously assigned by the old leader. These primary keys were also used in a Redis store, so the reuse of primary keys resulted in inconsistency between MySQL and Redis, which caused some private data to be disclosed to the wrong users
         - Split Brain, when a leader is unresponsive for sometime and becomes online again after a follower is promoted as a leader. If both leaders accept right with no process to resolve conflicts, it could lead to data corruption
     - Most failovers are performed manually even when software supports automatic failover
+
 2.) Multi Leader
     - Useful in scenarios when multiple datacenters are used. When one datacenter fails the traffic is routed to the other
 
